@@ -356,7 +356,11 @@ def get_us_stock_symbols(qlib_data_path: [str, Path] = None) -> list:
         return _symbols
 
     if _US_SYMBOLS is None:
-        _all_symbols = _get_eastmoney() + _get_nasdaq() + _get_nyse()
+        _all_symbols = _get_nasdaq() + _get_nyse()
+        try:
+            _all_symbols += _get_eastmoney()
+        except Exception as e:  # pragma: no cover - network errors
+            logger.warning(f"fetch symbols from EastMoney failed: {e}")
         if qlib_data_path is not None:
             for _index in ["nasdaq100", "sp500"]:
                 ins_df = pd.read_csv(
